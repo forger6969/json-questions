@@ -2023,50 +2023,35 @@
     ],
     "users": [
         {
-            "id": 1,
-            "login": "alex123",
-            "password": "pass12345",
-            "name": "Alex",
-            "surname": "Johnson",
-            "points": 0
-        },
-        {
-            "id": 2,
-            "login": "maria_dev",
-            "password": "maria2024",
-            "name": "Maria",
-            "surname": "Sultanova",
-            "points": 0
-        },
-        {
-            "id": 3,
-            "login": "js_master",
-            "password": "jsrocks99",
-            "name": "Dmitry",
-            "surname": "Petrov",
-            "points": 0
-        },
-        {
-            "id": 4,
-            "login": "frontend_girl",
-            "password": "reactbest",
-            "name": "Amina",
-            "surname": "Karimova",
-            "points": 0
-        },
-        {
-            "id": 5,
-            "login": "coder_tim",
-            "password": "timsecure",
-            "name": "Timur",
-            "surname": "Abdullayev",
-            "points": 0
-        },
-        {
+            "id": "b2f5",
             "firstName": "Saidazim",
             "lastName": "Buriboyev",
             "login": "37138",
             "password": 1314766,
+            "totalScore": 0
+        },
+        {
+            "id": "fg8b",
+            "firstName": "Azizbek",
+            "lastName": "Amangeldiev",
+            "login": "987681",
+            "password": 4983467,
+            "totalScore": 0
+        },
+        {
+            "id": "v1b8",
+            "firstName": "Vorisjon",
+            "lastName": "Boboyev",
+            "login": "4394089",
+            "password": 1938940,
+            "totalScore": 0
+        },
+        {
+            "id": "ndh8",
+            "firstName": "Nig'matullayev",
+            "lastName": "Kozim",
+            "login": "094367",
+            "password": 7089365,
             "totalScore": 0
         }
     ]
