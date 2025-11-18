@@ -2053,6 +2053,54 @@
             "login": "094367",
             "password": 7089365,
             "totalScore": 0
+        },
+        {
+            "id": "s1hd",
+            "firstName": "Sunnatillayev",
+            "lastName": "Hamidulla",
+            "login": "489361",
+            "password": 731783,
+            "totalScore": 0
+        },
+        {
+            "id": "kl8a",
+            "firstName": "Usmonov",
+            "lastName": "Muhammadamin",
+            "login": "890173",
+            "password": 792648,
+            "totalScore": 0
+        },
+        {
+            "id": "q01r",
+            "firstName": "Qahramonov",
+            "lastName": "Ahmadjon",
+            "login": "3681674",
+            "password": 8402764,
+            "totalScore": 0
+        },
+        {
+            "id": "b6el",
+            "firstName": "Baxtiyorov",
+            "lastName": "Elyor",
+            "login": "981273",
+            "password": 1391281,
+            "totalScore": 0
+        },
+        {
+            "id": "sjn1",
+            "firstName": "Hamidullayev",
+            "lastName": "Odiljon",
+            "login": "719372",
+            "password": 7198461,
+            "totalScore": 0
+        },
+        {
+            "id": "2sd3",
+            "firstName": "Zokirov",
+            "lastName": "Asadbek",
+            "login": "7046793",
+            "password": 2639471,
+            "totalScore": 0
         }
     ]
 }
