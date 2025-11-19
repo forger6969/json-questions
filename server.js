@@ -104,7 +104,9 @@ app.post("/add-test-result", (req, res) => {
         student_id,
         mentor_id,
         test_score,
-        test_max_score
+        test_max_score,
+        test_date,
+        test_type
     };
 
     db.test_results.push(newResult);
