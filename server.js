@@ -95,7 +95,7 @@ app.post("/update-score", (req, res) => {
 
 // ====== ADD TEST RESULT ======
 app.post("/add-test-result", (req, res) => {
-    const { student_id, mentor_id, test_score, test_max_score } = req.body;
+    const { student_id, mentor_id, test_score, test_max_score, test_date, test_type } = req.body;
 
     const db = loadDB();
 
