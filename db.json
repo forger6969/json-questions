@@ -2101,12 +2101,86 @@
             "login": "7046793",
             "password": 2639471,
             "totalScore": 0
-        }
+        },
+        [
+            {
+                "id": "std1",
+                "firstName": "Botuxonov",
+                "lastName": "Xurshidxon",
+                "login": "935128",
+                "password": 6482913,
+                "totalScore": 0
+            },
+            {
+                "id": "std2",
+                "firstName": "Yunusov",
+                "lastName": "Abdulloh",
+                "login": "713942",
+                "password": 4829317,
+                "totalScore": 0
+            },
+            {
+                "id": "std3",
+                "firstName": "Abduramonov",
+                "lastName": "Abdumavlon",
+                "login": "802194",
+                "password": 9182374,
+                "totalScore": 0
+            },
+            {
+                "id": "std4",
+                "firstName": "Baxtiyorov",
+                "lastName": "Saidali",
+                "login": "624715",
+                "password": 7129834,
+                "totalScore": 0
+            },
+            {
+                "id": "std5",
+                "firstName": "Kamron",
+                "lastName": "Odiljonov",
+                "login": "518297",
+                "password": 2983746,
+                "totalScore": 0
+            },
+            {
+                "id": "std6",
+                "firstName": "Toxtaxojayev",
+                "lastName": "Saidislom",
+                "login": "639128",
+                "password": 9382714,
+                "totalScore": 0
+            },
+            {
+                "id": "std7",
+                "firstName": "Yodgorov",
+                "lastName": "Bexruz",
+                "login": "704512",
+                "password": 1836249,
+                "totalScore": 0
+            },
+            {
+                "id": "std8",
+                "firstName": "Shuhratov",
+                "lastName": "Humoyun",
+                "login": "821974",
+                "password": 7618943,
+                "totalScore": 0
+            },
+            {
+                "id": "std9",
+                "firstName": "Ismatov",
+                "lastName": "Sardor",
+                "login": "519742",
+                "password": 4179283,
+                "totalScore": 0
+            }
+        ]
     ],
     "mentors": [
         {
             "id": "1fo0",
-            "firstName": "Emirhat",
+            "firstName": "Emirhan",
             "lastName": "Ertan",
             "login": "946188877",
             "password": "emirhan7788"
