@@ -1,8 +1,25 @@
 {
   "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
     "json-server": "^1.0.0-beta.3"
   },
   "scripts": {
     "start": "json-server --watch db.json --port 3002"
-  }
+  },
+  "name": "json-quests",
+  "version": "1.0.0",
+  "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/forger6969/json-questions.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/forger6969/json-questions/issues"
+  },
+  "homepage": "https://github.com/forger6969/json-questions#readme",
+  "description": ""
 }
