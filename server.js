@@ -301,6 +301,13 @@ app.delete("/mentors/password/:password", async (req, res) => {
   res.json({ message: `Ментор с паролем "${passwordToDelete}" удален`, mentor: { ...mentor.toObject(), id: mentor._id } });
 });
 
+// DELETE all tests
+app.delete("/tests", async (req, res) => {
+  const result = await Test.deleteMany({});
+  res.json({ message: `Удалено ${result.deletedCount} тестов` });
+});
+
+
 // ======================== SERVER START ========================
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
