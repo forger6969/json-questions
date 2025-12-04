@@ -28,10 +28,16 @@ const Mentor = mongoose.model("Mentor", new mongoose.Schema({
   password: String
 }));
 
+// Новая схема вопросов под JSON с variants и correctAnswer
 const QuestionSchema = new mongoose.Schema({
-  text: String,
-  options: [String],
-  correctIndex: Number,
+  question: String,
+  variants: [
+    {
+      key: String,
+      text: String
+    }
+  ],
+  correctAnswer: String,
   score: Number
 });
 
@@ -293,62 +299,6 @@ app.delete("/mentors/password/:password", async (req, res) => {
   if (!mentor) return res.status(404).json({ message: "Ментор с таким паролем не найден" });
 
   res.json({ message: `Ментор с паролем "${passwordToDelete}" удален`, mentor: { ...mentor.toObject(), id: mentor._id } });
-});
-
-
-app.get("/stats/test/:testId", async (req, res) => {
-  const test = await Test.findById(req.params.testId);
-  if (!test) return res.status(404).json({ message: "Тест не найден" });
-
-  const results = await Result.find({ test_id: req.params.testId });
-
-  const stats = {
-    test: {
-      id: test._id,
-      name: test.name,
-      maxScore: test.maxScore,
-      questionCount: test.questions.length
-    },
-    completedBy: results.length,
-    averageScore: results.length
-      ? Math.round(results.reduce((sum, r) => sum + r.test_score, 0) / results.length)
-      : 0,
-    averagePercentage: results.length
-      ? Math.round(results.reduce((sum, r) => sum + r.percentage, 0) / results.length)
-      : 0,
-    topStudents: (await Promise.all(results.map(async r => {
-      const student = await User.findById(r.student_id);
-      return {
-        name: student ? `${student.firstName} ${student.lastName}` : "Неизвестный",
-        score: r.test_score,
-        percentage: r.percentage,
-        date: r.test_date
-      };
-    })))
-      .sort((a, b) => b.percentage - a.percentage)
-      .slice(0, 10)
-  };
-
-  res.json(stats);
-});
-
-app.get("/stats/general", async (req, res) => {
-  const totalStudents = await User.countDocuments();
-  const totalMentors = await Mentor.countDocuments();
-  const totalTests = await Test.countDocuments();
-  const results = await Result.find();
-
-  const avgPercentage = results.length
-    ? Math.round(results.reduce((sum, r) => sum + r.percentage, 0) / results.length)
-    : 0;
-
-  res.json({
-    totalStudents,
-    totalMentors,
-    totalTests,
-    totalResults: results.length,
-    averagePercentage: avgPercentage
-  });
 });
 
 // ======================== SERVER START ========================
