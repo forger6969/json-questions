@@ -28,7 +28,6 @@ const Mentor = mongoose.model("Mentor", new mongoose.Schema({
   password: String
 }));
 
-// Новая схема вопросов под JSON с variants и correctAnswer
 const QuestionSchema = new mongoose.Schema({
   question: String,
   variants: [
@@ -96,6 +95,12 @@ app.delete("/tests/:id", async (req, res) => {
   const test = await Test.findByIdAndDelete(req.params.id);
   if (!test) return res.status(404).json({ message: "Тест не найден" });
   res.json({ message: "Тест удален" });
+});
+
+// DELETE all tests
+app.delete("/tests", async (req, res) => {
+  const result = await Test.deleteMany({});
+  res.json({ message: `Удалено ${result.deletedCount} тестов` });
 });
 
 // ======================== USERS ========================
@@ -196,14 +201,16 @@ app.post("/login/mentor", async (req, res) => {
 
 // ======================== RESULTS ========================
 app.post("/results", async (req, res) => {
-  const { student_id, mentor_id, test_id, test_score, test_max_score, test_type } = req.body;
+  const { student_id, mentor_id, test_id, test_score, test_type } = req.body;
 
   const student = await User.findById(student_id);
   const test = await Test.findById(test_id);
   if (!student) return res.status(404).json({ message: "Студент не найден" });
   if (!test) return res.status(404).json({ message: "Тест не найден" });
 
+  const test_max_score = test.maxScore; // максимальный балл берём из теста
   const percentage = Math.round((test_score / test_max_score) * 100);
+
   const result = await Result.create({
     student_id,
     mentor_id,
@@ -214,6 +221,10 @@ app.post("/results", async (req, res) => {
     test_date: new Date().toISOString(),
     percentage
   });
+
+  // автоматически обновляем totalScore студента
+  student.totalScore += test_score;
+  await student.save();
 
   res.json({ message: "Результат сохранен", result: { ...result.toObject(), id: result._id } });
 });
@@ -300,13 +311,6 @@ app.delete("/mentors/password/:password", async (req, res) => {
 
   res.json({ message: `Ментор с паролем "${passwordToDelete}" удален`, mentor: { ...mentor.toObject(), id: mentor._id } });
 });
-
-// DELETE all tests
-app.delete("/tests", async (req, res) => {
-  const result = await Test.deleteMany({});
-  res.json({ message: `Удалено ${result.deletedCount} тестов` });
-});
-
 
 // ======================== SERVER START ========================
 const PORT = process.env.PORT || 4000;
