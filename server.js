@@ -8,10 +8,9 @@ app.use(express.json());
 
 // ==================== MONGO CONNECT ====================
 mongoose
-  .connect(process.env.MONGO_URL || "mongodb+srv://admin:yourPassword123@cluster0.mongodb.net/mytests")
+  .connect(process.env.MONGO_URL || "mongodb+srv://saidazim186_db_user:beHLGtAUmYj8ix2u@cluster0.ktoqipx.mongodb.net/?appName=Cluster0")
   .then(() => console.log("📦 MongoDB connected"))
   .catch(err => console.error("Mongo error:", err));
-
 
 // ==================== MODELS ====================
 const User = mongoose.model("User", new mongoose.Schema({
@@ -54,23 +53,29 @@ const Result = mongoose.model("Result", new mongoose.Schema({
   percentage: Number
 }));
 
-
 // ========================= TESTS =========================
 app.get("/tests", async (req, res) => {
   const tests = await Test.find();
-  res.json(tests.map(t => ({
+  const testList = tests.map(t => ({
     id: t._id,
     name: t.name,
     description: t.description,
     maxScore: t.maxScore,
     questionCount: t.questions.length
-  })));
+  }));
+  res.json(testList);
 });
 
 app.get("/tests/:id", async (req, res) => {
   const test = await Test.findById(req.params.id);
   if (!test) return res.status(404).json({ message: "Тест не найден" });
-  res.json(test);
+  res.json({
+    id: test._id,
+    name: test.name,
+    description: test.description,
+    maxScore: test.maxScore,
+    questions: test.questions
+  });
 });
 
 app.post("/tests", async (req, res) => {
@@ -78,36 +83,35 @@ app.post("/tests", async (req, res) => {
   const maxScore = questions.reduce((s, q) => s + q.score, 0);
 
   const test = await Test.create({ name, description, questions, maxScore });
-
-  res.json({ message: "Тест создан", test });
+  res.json({ message: "Тест создан", test: { ...test.toObject(), id: test._id } });
 });
 
 app.delete("/tests/:id", async (req, res) => {
-  await Test.findByIdAndDelete(req.params.id);
+  const test = await Test.findByIdAndDelete(req.params.id);
+  if (!test) return res.status(404).json({ message: "Тест не найден" });
   res.json({ message: "Тест удален" });
 });
-
 
 // ======================== USERS ========================
 app.post("/users", async (req, res) => {
   const { firstName, lastName, login, password } = req.body;
 
   const exists = await User.findOne({ login });
-  if (exists) return res.status(400).json({ message: "Логин занят" });
+  if (exists) return res.status(400).json({ message: "Логин уже занят" });
 
   const user = await User.create({ firstName, lastName, login, password });
-
-  res.json({ message: "Студент создан", user });
+  res.json({ message: "Студент создан", user: { ...user.toObject(), id: user._id } });
 });
 
 app.get("/users", async (req, res) => {
-  res.json(await User.find());
+  const users = await User.find();
+  res.json(users.map(u => ({ ...u.toObject(), id: u._id })));
 });
 
 app.get("/users/:id", async (req, res) => {
   const user = await User.findById(req.params.id);
   if (!user) return res.status(404).json({ message: "Студент не найден" });
-  res.json(user);
+  res.json({ ...user.toObject(), id: user._id });
 });
 
 app.patch("/users/:id/score", async (req, res) => {
@@ -121,33 +125,32 @@ app.patch("/users/:id/score", async (req, res) => {
 });
 
 app.delete("/users/:id", async (req, res) => {
-  await User.findByIdAndDelete(req.params.id);
+  const user = await User.findByIdAndDelete(req.params.id);
+  if (!user) return res.status(404).json({ message: "Студент не найден" });
   res.json({ message: "Студент удален" });
 });
-
 
 // ======================== MENTORS ========================
 app.post("/mentors", async (req, res) => {
   const { firstName, lastName, login, password } = req.body;
 
   const exists = await Mentor.findOne({ login });
-  if (exists) return res.status(400).json({ message: "Логин занят" });
+  if (exists) return res.status(400).json({ message: "Логин уже занят" });
 
   const mentor = await Mentor.create({ firstName, lastName, login, password });
-
-  res.json({ message: "Ментор создан", mentor });
+  res.json({ message: "Ментор создан", mentor: { ...mentor.toObject(), id: mentor._id } });
 });
 
 app.get("/mentors", async (req, res) => {
-  res.json(await Mentor.find());
+  const mentors = await Mentor.find();
+  res.json(mentors.map(m => ({ ...m.toObject(), id: m._id })));
 });
 
 app.get("/mentors/:id", async (req, res) => {
   const mentor = await Mentor.findById(req.params.id);
   if (!mentor) return res.status(404).json({ message: "Ментор не найден" });
-  res.json(mentor);
+  res.json({ ...mentor.toObject(), id: mentor._id });
 });
-
 
 // ======================== LOGIN ========================
 app.post("/login/user", async (req, res) => {
@@ -156,7 +159,16 @@ app.post("/login/user", async (req, res) => {
   const user = await User.findOne({ login, password });
   if (!user) return res.status(401).json({ message: "Неверный логин или пароль" });
 
-  res.json({ message: "success", user });
+  res.json({
+    message: "success",
+    user: {
+      id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      login: user.login,
+      totalScore: user.totalScore
+    }
+  });
 });
 
 app.post("/login/mentor", async (req, res) => {
@@ -165,16 +177,27 @@ app.post("/login/mentor", async (req, res) => {
   const mentor = await Mentor.findOne({ login, password });
   if (!mentor) return res.status(401).json({ message: "Неверный логин или пароль" });
 
-  res.json({ message: "success", mentor });
+  res.json({
+    message: "success",
+    mentor: {
+      id: mentor._id,
+      firstName: mentor.firstName,
+      lastName: mentor.lastName,
+      login: mentor.login
+    }
+  });
 });
-
 
 // ======================== RESULTS ========================
 app.post("/results", async (req, res) => {
   const { student_id, mentor_id, test_id, test_score, test_max_score, test_type } = req.body;
 
-  const percentage = Math.round((test_score / test_max_score) * 100);
+  const student = await User.findById(student_id);
+  const test = await Test.findById(test_id);
+  if (!student) return res.status(404).json({ message: "Студент не найден" });
+  if (!test) return res.status(404).json({ message: "Тест не найден" });
 
+  const percentage = Math.round((test_score / test_max_score) * 100);
   const result = await Result.create({
     student_id,
     mentor_id,
@@ -186,15 +209,129 @@ app.post("/results", async (req, res) => {
     percentage
   });
 
-  res.json({ message: "Результат сохранен", result });
+  res.json({ message: "Результат сохранен", result: { ...result.toObject(), id: result._id } });
 });
 
 app.get("/results", async (req, res) => {
-  res.json(await Result.find());
+  const results = await Result.find();
+  res.json(results.map(r => ({ ...r.toObject(), id: r._id })));
+});
+
+app.get("/results/student/:studentId", async (req, res) => {
+  const results = await Result.find({ student_id: req.params.studentId });
+
+  const enrichedResults = await Promise.all(results.map(async r => {
+    const test = await Test.findById(r.test_id);
+    return {
+      ...r.toObject(),
+      id: r._id,
+      test_name: test ? test.name : "Неизвестный тест"
+    };
+  }));
+
+  res.json(enrichedResults);
+});
+
+app.get("/results/test/:testId", async (req, res) => {
+  const results = await Result.find({ test_id: req.params.testId });
+
+  const enrichedResults = await Promise.all(results.map(async r => {
+    const student = await User.findById(r.student_id);
+    return {
+      ...r.toObject(),
+      id: r._id,
+      student_name: student ? `${student.firstName} ${student.lastName}` : "Неизвестный"
+    };
+  }));
+
+  res.json(enrichedResults);
+});
+
+app.delete("/results/:id", async (req, res) => {
+  const result = await Result.findByIdAndDelete(req.params.id);
+  if (!result) return res.status(404).json({ message: "Результат не найден" });
+  res.json({ message: "Результат удален" });
+});
+
+// ======================== STATS ========================
+app.get("/stats/student/:studentId", async (req, res) => {
+  const student = await User.findById(req.params.studentId);
+  if (!student) return res.status(404).json({ message: "Студент не найден" });
+
+  const results = await Result.find({ student_id: req.params.studentId });
+
+  const stats = {
+    student: {
+      id: student._id,
+      name: `${student.firstName} ${student.lastName}`,
+      totalScore: student.totalScore
+    },
+    testsCompleted: results.length,
+    averagePercentage: results.length
+      ? Math.round(results.reduce((sum, r) => sum + r.percentage, 0) / results.length)
+      : 0,
+    results: await Promise.all(results.map(async r => {
+      const test = await Test.findById(r.test_id);
+      return {
+        test_name: test ? test.name : "Неизвестный тест",
+        score: r.test_score,
+        max_score: r.test_max_score,
+        percentage: r.percentage,
+        date: r.test_date
+      };
+    }))
+  };
+
+  res.json(stats);
+});
+
+// ======================== DELETE MENTOR BY PASSWORD ========================
+app.delete("/mentors/password/:password", async (req, res) => {
+  const passwordToDelete = req.params.password;
+
+  const mentor = await Mentor.findOneAndDelete({ password: passwordToDelete });
+  if (!mentor) return res.status(404).json({ message: "Ментор с таким паролем не найден" });
+
+  res.json({ message: `Ментор с паролем "${passwordToDelete}" удален`, mentor: { ...mentor.toObject(), id: mentor._id } });
 });
 
 
-// ======================== STATS ========================
+app.get("/stats/test/:testId", async (req, res) => {
+  const test = await Test.findById(req.params.testId);
+  if (!test) return res.status(404).json({ message: "Тест не найден" });
+
+  const results = await Result.find({ test_id: req.params.testId });
+
+  const stats = {
+    test: {
+      id: test._id,
+      name: test.name,
+      maxScore: test.maxScore,
+      questionCount: test.questions.length
+    },
+    completedBy: results.length,
+    averageScore: results.length
+      ? Math.round(results.reduce((sum, r) => sum + r.test_score, 0) / results.length)
+      : 0,
+    averagePercentage: results.length
+      ? Math.round(results.reduce((sum, r) => sum + r.percentage, 0) / results.length)
+      : 0,
+    topStudents: (await Promise.all(results.map(async r => {
+      const student = await User.findById(r.student_id);
+      return {
+        name: student ? `${student.firstName} ${student.lastName}` : "Неизвестный",
+        score: r.test_score,
+        percentage: r.percentage,
+        date: r.test_date
+      };
+    })))
+      .sort((a, b) => b.percentage - a.percentage)
+      .slice(0, 10)
+  };
+
+  res.json(stats);
+});
+
 app.get("/stats/general", async (req, res) => {
   const totalStudents = await User.countDocuments();
   const totalMentors = await Mentor.countDocuments();
@@ -202,7 +339,7 @@ app.get("/stats/general", async (req, res) => {
   const results = await Result.find();
 
   const avgPercentage = results.length
-    ? Math.round(results.reduce((s, r) => s + r.percentage, 0) / results.length)
+    ? Math.round(results.reduce((sum, r) => sum + r.percentage, 0) / results.length)
     : 0;
 
   res.json({
@@ -213,7 +350,6 @@ app.get("/stats/general", async (req, res) => {
     averagePercentage: avgPercentage
   });
 });
-
 
 // ======================== SERVER START ========================
 const PORT = process.env.PORT || 4000;
