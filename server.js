@@ -68,10 +68,12 @@ app.get("/tests", async (req, res) => {
     name: t.name,
     description: t.description,
     maxScore: t.maxScore,
-    questionCount: t.questions.length
+    questionCount: t.questions.length,
+    time: t.time || 25 * 60 * 1000 // если время не указано, 25 минут по умолчанию
   }));
   res.json(testList);
 });
+
 
 app.get("/tests/:id", async (req, res) => {
   const test = await Test.findById(req.params.id);
