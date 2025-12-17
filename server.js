@@ -44,8 +44,10 @@ const Test = mongoose.model("Test", new mongoose.Schema({
   name: String,
   description: String,
   maxScore: Number,
+  time: Number, // время теста в миллисекундах
   questions: [QuestionSchema]
 }));
+
 
 const Result = mongoose.model("Result", new mongoose.Schema({
   student_id: String,
@@ -79,17 +81,21 @@ app.get("/tests/:id", async (req, res) => {
     name: test.name,
     description: test.description,
     maxScore: test.maxScore,
+    time: test.time, // добавили поле времени
     questions: test.questions
   });
+
 });
 
 app.post("/tests", async (req, res) => {
-  const { name, description, questions } = req.body;
+  const { name, description, questions, time } = req.body; // добавили time
   const maxScore = questions.reduce((s, q) => s + q.score, 0);
 
-  const test = await Test.create({ name, description, questions, maxScore });
+  const test = await Test.create({ name, description, questions, maxScore, time });
   res.json({ message: "Тест создан", test: { ...test.toObject(), id: test._id } });
 });
+
+
 
 app.delete("/tests/:id", async (req, res) => {
   const test = await Test.findByIdAndDelete(req.params.id);
