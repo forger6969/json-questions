@@ -393,15 +393,16 @@ app.post("/assignments", async (req, res) => {
   if (!student) return res.status(404).json({ message: "Студент не найден" });
   if (!test) return res.status(404).json({ message: "Тест не найден" });
 
-  // Проверка, не назначен ли уже этот тест этому студенту
+  // ИСПРАВЛЕНО: Проверка только на активные назначения (pending), 
+  // просроченные и завершенные можно назначать заново
   const existingAssignment = await Assignment.findOne({
     student_id,
     test_id,
-    status: { $in: ['pending', 'overdue'] }
+    status: 'pending' // проверяем только pending
   });
 
   if (existingAssignment) {
-    return res.status(400).json({ message: "Этот тест уже назначен данному студенту" });
+    return res.status(400).json({ message: "Этот тест уже назначен данному студенту и ожидает выполнения" });
   }
 
   const assignment = await Assignment.create({
@@ -499,6 +500,51 @@ app.delete("/assignments/:id", async (req, res) => {
   const assignment = await Assignment.findByIdAndDelete(req.params.id);
   if (!assignment) return res.status(404).json({ message: "Назначение не найдено" });
   res.json({ message: "Назначение удалено" });
+});
+
+// НОВОЕ: Переназначить просроченное задание (продлить срок)
+app.patch("/assignments/:id/extend", async (req, res) => {
+  const { new_deadline } = req.body;
+  
+  if (!new_deadline) {
+    return res.status(400).json({ message: "Укажите новый срок" });
+  }
+
+  const assignment = await Assignment.findById(req.params.id);
+  if (!assignment) return res.status(404).json({ message: "Назначение не найдено" });
+
+  // Обновляем дедлайн и сбрасываем статус на pending
+  assignment.deadline = new Date(new_deadline);
+  assignment.status = 'pending';
+  assignment.completed_date = undefined;
+  assignment.result_id = undefined;
+  
+  await assignment.save();
+
+  // Уведомить студента о продлении
+  await Notification.create({
+    user_id: assignment.student_id,
+    user_type: 'student',
+    title: "⏰ Срок продлен",
+    message: `Срок выполнения задания продлен до ${new Date(new_deadline).toLocaleDateString()}`,
+    type: 'deadline',
+    related_id: assignment._id
+  });
+
+  res.json({ 
+    message: "Срок продлен", 
+    assignment: { ...assignment.toObject(), id: assignment._id } 
+  });
+});
+
+// НОВОЕ: Закрыть/отменить просроченное задание без выполнения
+app.patch("/assignments/:id/cancel", async (req, res) => {
+  const assignment = await Assignment.findById(req.params.id);
+  if (!assignment) return res.status(404).json({ message: "Назначение не найдено" });
+
+  await Assignment.findByIdAndDelete(req.params.id);
+
+  res.json({ message: "Задание отменено и удалено" });
 });
 
 // Получить статистику по назначениям для студента
